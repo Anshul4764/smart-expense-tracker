@@ -56,6 +56,23 @@ pipeline {
             }
         }
 
+        stage('Code Quality') {
+            steps {
+                script {
+                    def scannerHome = tool 'SonarScanner'
+                    withSonarQubeEnv('SonarQubeCloud') {
+                        sh """
+                        ${scannerHome}/bin/sonar-scanner \
+                        -Dsonar.projectKey=YOUR_PROJECT_KEY \
+                        -Dsonar.organization=YOUR_ORGANIZATION_KEY \
+                        -Dsonar.sources=backend,frontend/src \
+                        -Dsonar.exclusions=**/node_modules/**,**/build/**,**/coverage/**,**/*.test.js
+                        """
+                    }
+                }
+            }
+        }
+
         stage('Security') {
             steps {
                 sh 'mkdir -p security-reports'
