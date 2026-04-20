@@ -57,21 +57,22 @@ pipeline {
         }
 
         stage('Code Quality') {
-            steps {
-                script {
-                    def scannerHome = tool 'SonarScanner'
-                    withSonarQubeEnv('SonarQubeCloud') {
-                        sh """
-                        ${scannerHome}/bin/sonar-scanner \
-                        -Dsonar.projectKey=YOUR_PROJECT_KEY \
-                        -Dsonar.organization=YOUR_ORGANIZATION_KEY \
-                        -Dsonar.sources=backend,frontend/src \
-                        -Dsonar.exclusions=**/node_modules/**,**/build/**,**/coverage/**,**/*.test.js
-                        """
-                    }
-                }
+    steps {
+        script {
+            def scannerHome = tool 'SonarScanner'
+            withSonarQubeEnv('SonarQubeCloud') {
+                sh """
+                ${scannerHome}/bin/sonar-scanner \
+                -Dsonar.projectKey=Anshul4764_smart-expense-tracker \
+                -Dsonar.organization=anshul4764 \
+                -Dsonar.sources=backend,frontend/src \
+                -Dsonar.host.url=https://sonarcloud.io \
+                -Dsonar.login=${SONAR_AUTH_TOKEN}
+                """
             }
         }
+    }
+}
 
         stage('Security') {
             steps {
@@ -143,3 +144,4 @@ pipeline {
         }
     }
 }
+
