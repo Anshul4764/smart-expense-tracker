@@ -60,9 +60,20 @@ pipeline {
             }
         }
 
-        stage('Deploy Placeholder') {
+        stage('Deploy to Staging') {
             steps {
-                echo 'Deployment stage placeholder completed successfully.'
+                sh 'docker compose down -v || true'
+                sh 'docker compose build'
+                sh 'docker compose up -d'
+            }
+        }
+
+        stage('Verify Deployment') {
+            steps {
+                sh 'sleep 20'
+                sh 'curl -f http://localhost:5001/health'
+                sh 'curl -I http://localhost:3000'
+                sh 'docker compose ps'
             }
         }
     }
@@ -73,6 +84,10 @@ pipeline {
         }
         failure {
             echo 'Pipeline failed. Check console output.'
+            sh 'docker compose logs --no-color || true'
+        }
+        always {
+            archiveArtifacts artifacts: 'frontend/build/**', fingerprint: true
         }
     }
 }

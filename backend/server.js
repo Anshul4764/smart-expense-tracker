@@ -1,4 +1,3 @@
-
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -18,13 +17,15 @@ app.use(express.json());
 app.get("/", (req, res) => {
   res.json({ message: "Smart Expense Tracker backend is running" });
 });
+
 app.get("/health", (req, res) => {
   res.status(200).json({
     status: "UP",
     service: "smart-expense-tracker-backend",
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
   });
 });
+
 app.use("/api/finance", financeRoutes);
 app.use("/api/portfolio", portfolioRoutes);
 
