@@ -89,6 +89,16 @@ pipeline {
                 sh 'docker compose ps'
             }
         }
+
+        stage('Monitoring') {
+            steps {
+                sh 'mkdir -p monitoring-reports'
+                sh 'curl -s http://localhost:5001/health > monitoring-reports/backend-health.json'
+                sh 'curl -I http://localhost:3000 > monitoring-reports/frontend-health.txt'
+                sh 'docker compose ps > monitoring-reports/container-status.txt'
+                archiveArtifacts artifacts: 'monitoring-reports/**', fingerprint: true
+            }
+        }
     }
 
     post {
