@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         PATH = "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
+        RELEASE_VERSION = "v1.0.${BUILD_NUMBER}"
     }
 
     stages {
@@ -97,6 +98,17 @@ pipeline {
                 sh 'curl -I http://localhost:3000 > monitoring-reports/frontend-health.txt'
                 sh 'docker compose ps > monitoring-reports/container-status.txt'
                 archiveArtifacts artifacts: 'monitoring-reports/**', fingerprint: true
+            }
+        }
+
+        stage('Release') {
+            steps {
+                sh 'mkdir -p release-reports'
+                sh 'echo $RELEASE_VERSION > release-reports/release-version.txt'
+                sh 'git rev-parse HEAD > release-reports/release-commit.txt'
+                sh 'date > release-reports/release-date.txt'
+                sh 'echo "Release prepared successfully: $RELEASE_VERSION" > release-reports/release-summary.txt'
+                archiveArtifacts artifacts: 'release-reports/**', fingerprint: true
             }
         }
     }
