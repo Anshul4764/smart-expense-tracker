@@ -30,7 +30,7 @@ pipeline {
             }
         }
 
-        stage('Backend Smoke Test') {
+        stage('Test') {
             steps {
                 dir('backend') {
                     sh 'npm test'
@@ -46,17 +46,30 @@ pipeline {
             }
         }
 
-        stage('Build Frontend') {
+        stage('Build') {
             steps {
                 dir('frontend') {
                     sh 'npm run build'
                 }
+                archiveArtifacts artifacts: 'frontend/build/**', fingerprint: true
             }
         }
 
-        stage('Archive Build') {
+        stage('Security') {
             steps {
-                archiveArtifacts artifacts: 'frontend/build/**', fingerprint: true
+                sh 'mkdir -p security-reports'
+
+                dir('backend') {
+                    sh 'npm audit --json > ../security-reports/backend-audit.json || true'
+                    sh 'npm audit > ../security-reports/backend-audit.txt || true'
+                }
+
+                dir('frontend') {
+                    sh 'npm audit --json > ../security-reports/frontend-audit.json || true'
+                    sh 'npm audit > ../security-reports/frontend-audit.txt || true'
+                }
+
+                archiveArtifacts artifacts: 'security-reports/**', fingerprint: true
             }
         }
 
